@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fruit Freshness Detector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin:0; padding:0; overflow:hidden; }
+    .bg-video { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition: opacity 1s ease-in-out; }
+    .visible { opacity:1; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-4">
+  <nav class="absolute top-4 left-4 space-x-4 text-white">
+    <a href="/" class="font-semibold">Home</a>
+    <a href="/how-it-works" class="font-semibold">How It Works</a>
+    <a href="/about" class="font-semibold">About Us</a>
+  </nav>
+
+  <!-- Crossfade Background Videos -->
+  <video id="bg1" class="bg-video" autoplay muted playsinline></video>
+  <video id="bg2" class="bg-video" autoplay muted playsinline></video>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sources = [
+        "{{ url_for('static', filename='background1.mp4') }}",
+        "{{ url_for('static', filename='background2.mp4') }}"
+      ];
+      let current = 0;
+      let front = document.getElementById('bg1'), back = document.getElementById('bg2');
+      front.src = sources[0]; front.classList.add('visible');
+      function crossfade() {
+        const next = (current + 1) % sources.length;
+        back.src = sources[next]; back.load();
+        back.classList.add('visible'); front.classList.remove('visible');
+        setTimeout(() => {[front,back]=[back,front]; current = next;}, 1000);
+      }
+      front.addEventListener('ended', crossfade);
+      back.addEventListener('ended', crossfade);
+    });
+  </script>
+
+  <div class="bg-white bg-opacity-80 p-8 rounded-2xl shadow-xl max-w-lg w-full text-center z-10">
+    <h1 class="text-2xl font-bold mb-4 text-gray-800">🍎 FreshVision : Fruit Freshness Detector 🍌</h1>
+
+    <!-- Mode Selection -->
+    <div class="flex justify-center mb-4">
+      <button id="captureTab" class="px-4 py-2 bg-blue-200 rounded-l hover:bg-blue-300">Capture Image</button>
+      <button id="uploadTab"  class="px-4 py-2 bg-blue-200 rounded-r hover:bg-blue-300">Upload Image</button>
+    </div>
+
+    <!-- Main Form -->
+    <form id="mainForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+      <!-- Camera Section -->
+      <div id="cameraSection" class="hidden mb-4">
+        <video id="video" width="224" height="224" class="mx-auto rounded-md border"></video>
+        <button type="button" id="snap" class="mt-2 bg-blue-400 hover:bg-blue-500 text-white py-1 px-3 rounded">Capture</button>
+      </div>
+
+      <!-- Hidden File Input -->
+      <input id="fileInput" type="file" name="image" accept="image/*" class="hidden">
+
+      <!-- Preview -->
+      <img id="previewImg" src="" alt="Preview" class="w-32 mx-auto rounded-xl border mb-4 hidden">
+
+      <!-- Submit & Clear -->
+      <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-xl font-semibold">Check Freshness</button>
+      <button name="clear" value="1" type="submit" class="w-full bg-red-400 hover:bg-red-500 text-white py-2 px-4 rounded-xl font-semibold">Clear History</button>
+    </form>
+
+    <!-- Result -->
+    {% if prediction %}
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold text-gray-700">Result: {{ prediction }}</h2>
+      <p class="text-gray-600">Confidence: {{ '%.1f'|format(confidence) }}%</p>
+    </div>
+    {% endif %}
+
+    <!-- History -->
+    {% if history %}
+    <div class="mt-6 text-left">
+      <h3 class="font-semibold text-gray-700">History (last 10):</h3>
+      <ul class="list-disc ml-5 text-gray-600">
+        {% for item in history %}
+        <li>{{ item.label }} — {{ item.confidence }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+
+  <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+</body>
+</html>
