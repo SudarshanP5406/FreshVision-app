@@ -32,7 +32,6 @@ def index():
             confidence = proba[idx]*100
             session['history'].insert(0, {'label':prediction, 'confidence':f"{confidence:.1f}%"})
             session['history'] = session['history'][:10]
-    # Clear history
     if request.method == 'POST' and 'clear' in request.form:
         session['history'] = []
     return render_template('index.html', prediction=prediction, confidence=confidence, history=session['history'], img_url=img_url)
@@ -45,6 +44,6 @@ def how_it_works():
 def about():
     return render_template('about.html')
 
+# Only for local testing
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
