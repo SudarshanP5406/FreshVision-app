@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>How It Works</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; }
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <video id="background-video" autoplay muted playsinline></video>
+    <script>
+        const vids = [
+            "{{ url_for('static', filename='background1.mp4') }}",
+            "{{ url_for('static', filename='background2.mp4') }}"
+        ];
+        let idx = 0;
+        const vidEl = document.getElementById('background-video');
+        vidEl.src = vids[idx];
+        vidEl.addEventListener('ended', () => {
+            idx = (idx + 1) % vids.length;
+            vidEl.src = vids[idx];
+            vidEl.play();
+        });
+        vidEl.play();
+    </script>
+
+    <!-- Content Box -->
+    <div class="relative min-h-screen flex items-center justify-center p-8">
+      <div class="bg-white bg-opacity-90 p-8 rounded-2xl shadow-lg max-w-3xl w-full">
+        <a href="/" class="text-blue-500 hover:underline">&larr; Back to Home</a>
+        <h1 class="text-3xl font-bold my-4">How Does This AI Work?</h1>
+        <p class="text-gray-700 leading-relaxed">
+            <p><strong>1. Image Input</strong><br>
+            You can either upload an image or capture one using your webcam.</p>
+
+            <p><strong>2. Preprocessing</strong><br>
+            The image is resized and prepared so the AI model can understand it.</p>
+
+            <p><strong>3. AI Prediction</strong><br>
+            The image is passed through a trained deep learning model that analyzes the fruit’s color, texture, and other features.</p>
+
+            <p><strong>4. Result</strong><br>
+            The model then predicts if the fruit is fresh or not and shows the confidence level of the prediction.</p>
+        </p>
+      </div>
+    </div>
+</body>
+</html>
