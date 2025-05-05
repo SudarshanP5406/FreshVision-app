@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = 'replace_with_safe_key'
-model = load_model('freshness_model.keras')
+model = load_model('freshness_model.h5')
 class_names = ['Fresh Apple', 'Fresh Banana', 'Fresh Orange', 'Rotten Apple', 'Rotten Banana', 'Rotten Orange']
 
 @app.before_request
